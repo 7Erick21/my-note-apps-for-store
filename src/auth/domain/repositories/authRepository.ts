@@ -7,5 +7,5 @@ import {
 
 export interface AuthRepository {
   signIn(params: SignInRequest): Promise<SignInResponse>;
-  // signUp(params: SignUpRequest): Promise<SignUpResponse>;
+  signUp(params: SignUpRequest): Promise<SignUpResponse>;
 }

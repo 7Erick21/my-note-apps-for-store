@@ -1,9 +1,9 @@
 import { Context } from 'hono';
-import { SignInUseCase } from '../../application/SignInUseCase';
+import { AuthUseCase } from '../../application/authUseCase';
 import { SignInRequest, SignInResponse } from '../../domain/models/auth';
 
 export class SignInHandler {
-  constructor(private signInUseCase: SignInUseCase) {}
+  constructor(private signInUseCase: AuthUseCase) {}
 
   public handler = async (c: Context) => {
     const request = await c.req;

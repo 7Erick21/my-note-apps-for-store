@@ -4,12 +4,13 @@ import {
   getSupabase,
   supabaseMiddleware,
 } from '../../../shared/infraestructure/supabase';
-import { zUserValidator } from '../zod';
+import { zSignInValidator, zSignUpValidator } from '../zod';
 import { Auth, SignInRequest } from '../../domain/models/auth';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { SignInHandler } from '../handlers/SignInHandler';
-import { SignInUseCase } from '../../application/SignInUseCase';
-import { SupabaseSignInRepository } from '../supabase/SupabaseSignInRepository';
+import { SignInHandler } from '../handlers/signInHandler';
+import { AuthUseCase } from '../../application/authUseCase';
+import { SupabaseAuthRepository } from '../supabase/supabaseAuthRepository';
+import { SignUpHandler } from '../handlers/signUpHandler';
 
 export const users = new Hono<{ Bindings: Bindings }>().basePath('/');
 
@@ -20,7 +21,7 @@ const getUsers = async (supabase: SupabaseClient): Promise<Auth[]> => {
   return data as Auth[];
 };
 
-users.get('/', async (c) => {
+users.get('/users', async (c) => {
   const supabase = getSupabase(c);
   const data = await getUsers(supabase);
   return c.json({
@@ -28,10 +29,20 @@ users.get('/', async (c) => {
   });
 });
 
-users.post('/signIn', zUserValidator, async (c) => {
-  const Repository = new SupabaseSignInRepository(c);
-  const UseCase = new SignInUseCase(Repository);
+users.post('/signIn', zSignInValidator, async (c) => {
+  console.log(c.req, 'signInRequest');
+
+  const Repository = new SupabaseAuthRepository(c);
+  const UseCase = new AuthUseCase(Repository);
   const Handler = new SignInHandler(UseCase);
+
+  return Handler.handler(c);
+});
+
+users.post('/signUp', zSignUpValidator, async (c) => {
+  const Repository = new SupabaseAuthRepository(c);
+  const UseCase = new AuthUseCase(Repository);
+  const Handler = new SignUpHandler(UseCase);
 
   return Handler.handler(c);
 });
